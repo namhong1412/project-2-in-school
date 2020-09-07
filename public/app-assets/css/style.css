@@ -1,0 +1,12 @@
+#DataTables_Table_0_filter {
+    position: relative;
+    top: -14px;
+}
+tbody#history i {
+    font-size: 20px;
+    cursor: pointer;
+}
+
+i.ft-trash-2 {
+    color: #F44336;
+}

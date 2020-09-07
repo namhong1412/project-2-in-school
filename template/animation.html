@@ -1,0 +1,122 @@
+<script>
+$(document).ready(function() {
+var name = $("#name");
+var pitch_id = $("#san-bong-hoat-dong").find('option:selected').val();
+var type_pitch_id = $("#loai-san").find('option:selected').val();
+var time = $("#time");
+var time_from = $("#time_from");
+var time_to = $("#time_to");
+var per_hour = $("#per_hour");
+var surcharge = $("#surcharge");
+var deposit = $("#deposit");
+var note = $("#note");
+
+$.ajax({
+        url: '/api/dat-san/' + 1,
+        type: 'GET',
+        dataType: 'json',
+    })
+    .done(function(data) {
+        var info = data[0];
+        var date = new Date(info.time_from);
+        var date_to = new Date(info.time_to);
+
+        var dd = date.getDate();
+        var mm = date.getMonth() + 1;
+        var yyyy = date.getFullYear();
+
+        var hour_from = date.getHours();
+        var minute_from = date.getMinutes();
+
+        var hour_to = date_to.getHours();
+        var minute_to = date_to.getMinutes();
+
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+        date = yyyy + '-' + mm + '-' + dd;
+        $('#time').val(date);
+        name.val(info.name);
+        time_from.val(hour_from + ':' + minute_from);
+        time_to.val(hour_to + ':' + minute_to);
+        per_hour.val(info.per_hour);
+        surcharge.val(info.surcharge);
+        deposit.val(info.deposit);
+        note.val(info.note);
+        $('#kind option[value="' + info.kind + '"]').prop("selected", true);
+        $('#san-bong-hoat-dong option[value="' + info.type_pitch_id + '"]').prop("selected", true);
+    })
+    .fail(function(error) {
+        swal("Thất bại", error.responseJSON.message, "error");
+    })
+
+// Cập nhật
+$('#submit').click(() => {
+    var name = $("#name");
+    var pitch_id = $("#san-bong-hoat-dong").find('option:selected').val();
+    var type_pitch_id = $("#loai-san").find('option:selected').val();
+    var time = $("#time");
+    var time_from = $("#time_from");
+    var time_to = $("#time_to");
+    var per_hour = $("#per_hour");
+    var surcharge = $("#surcharge");
+    var deposit = $("#deposit");
+    var kind = $("#kind").find('option:selected').val();
+    var note = $("#note");
+    var time_from_c = time.val() + ' ' + time_from.val() + ':00';
+    var time_to_c = time.val() + ' ' + time_to.val() + ':00';
+    $.ajax({
+            url: '/api/dat-san/' + 1,
+            type: 'PUT',
+            dataType: 'json',
+            data: {
+                name: name.val(),
+                pitch_id: pitch_id,
+                type_pitch_id: type_pitch_id,
+                time_from: time_from_c,
+                time_to: time_to_c,
+                per_hour: per_hour.val(),
+                surcharge: surcharge.val(),
+                deposit: deposit.val(),
+                kind: kind,
+                note: note.val()
+            }
+        })
+        .done(function(data) {
+            swal("Thành công", data.message, "success");
+        })
+        .fail(function(error) {
+            swal("Thất bại", error.responseJSON.message, "error");
+        })
+
+
+    function get_san_bong() {
+        var branch = $('#san-bong-hoat-dong');
+        $.ajax({
+                url: '/api/san-bong-hoat-dong',
+                type: 'GET',
+                dataType: 'json',
+            })
+            .done(function(data) {
+                branch.html('');
+                var i = 0;
+                for (a of data) {
+                    i++;
+                    if (i == 1) {
+                        branch.append("<option value=" + a.id + " selected=''>" + a.name + "</option>");
+                    } else {
+                        branch.append("<option value=" + a.id + ">" + a.name + "</option>");
+                    }
+                }
+            })
+            .fail(function(error) {
+                console.error(error);
+            })
+    }
+
+    get_san_bong()
+});
+</script>
